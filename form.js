@@ -99,13 +99,15 @@
 
   function consentSection(c) {
     const date = field({ name: `date_${c.id}`, label: 'תאריך', type: 'date', required: true, today: true });
-    const fs = h('fieldset', { className: 'bare' },
-      ...paragraphs(c.paragraphs),
+    const signing = h('fieldset', { className: 'bare', disabled: true, hidden: true },
       h('div', { className: 'grid' }, signature(`sig_${c.id}`, c.signLabel, true), date));
-    const part = section(c.title, fs);
+    // Every consent is always readable. Only selected treatments open and require a signature.
+    const part = h('details', { className: 'part' },
+      h('summary', {}, h('h2', { textContent: c.title })),
+      ...paragraphs(c.paragraphs),
+      h('p', { className: 'hint', textContent: 'חתימה נדרשת רק אם סומן טיפול זה בפרטי הטיפול.' }),
+      signing);
     part.dataset.consent = c.id;
-    part.hidden = true;
-    fs.disabled = true;
     return part;
   }
 
@@ -187,8 +189,13 @@
     const chosen = selectedTreatments();
     form.querySelectorAll('[data-consent]').forEach((part) => {
       const on = chosen.includes(part.dataset.consent);
-      part.hidden = !on;
-      part.querySelector('fieldset').disabled = !on;
+      const signing = part.querySelector('fieldset');
+      // Open or close only when the choice changes, so the arrow stays under the client's control.
+      if (signing.disabled === on) part.open = on;
+      signing.disabled = !on;
+      signing.hidden = !on;
+      part.querySelector('.hint').hidden = on;
+      part.classList.toggle('is-unselected', !on);
     });
     const otherWrap = document.getElementById('other-wrap');
     otherWrap.hidden = !chosen.includes('other');
@@ -204,7 +211,7 @@
   }
 
   function sectionComplete(part) {
-    if (part.hidden) return false;
+    if (part.classList.contains('is-unselected')) return false;
     const inputs = [...part.querySelectorAll('input, textarea')].filter((i) => !i.matches(':disabled'));
     if (!inputs.every((i) => i.checkValidity())) return false;
     if (part.querySelector('#treatments') && !selectedTreatments().length) return false;
@@ -223,6 +230,11 @@
       document.getElementById('treatments').scrollIntoView({ block: 'center' });
       return false;
     }
+    // A closed section can't show a validation message, so open every selected one first.
+    selectedTreatments().forEach((id) => {
+      const part = form.querySelector(`[data-consent="${id}"]`);
+      if (part) part.open = true;
+    });
     if (!form.reportValidity()) return false;
     for (const [name, s] of sigs) {
       if (s.required && isActive(name) && s.pad.isEmpty()) {
