@@ -48,3 +48,11 @@ create policy "users can see their own admin row"
   on public.admins for select
   to authenticated
   using (user_id = auth.uid());
+
+-- Keeps the free-plan project awake. Reveals nothing; called weekly by .github/workflows/keepalive.yml.
+create function public.ping() returns boolean
+  language sql stable
+  set search_path = ''
+  as 'select true';
+revoke all on function public.ping() from public;
+grant execute on function public.ping() to anon;
