@@ -76,7 +76,7 @@
         h('div', { className: 'pills' }, ...checks),
         h('p', { className: 'error', id: 'treatments-error', hidden: true, textContent: 'יש לסמן לפחות טיפול אחד.' })),
       otherWrap,
-      h('details', { className: 'clinic' },
+      h('details', { className: 'clinic', open: true },
         h('summary', { textContent: 'למילוי על ידי הצוות המטפל: אזור, תכשיר ואצווה' }),
         h('div', { className: 'grid' }, ...F.CLINIC_FIELDS.map(field))));
   }
@@ -119,12 +119,12 @@
         h('legend', { textContent: F.FINAL.photoLabel }),
         h('div', { className: 'yesno wide-options' }, ...options)),
       ...paragraphs(F.FINAL.paragraphs),
-      h('details', { className: 'clinic' },
+      h('details', { className: 'clinic', open: true },
         h('summary', { textContent: 'מלווה או אפוטרופוס, אם רלוונטי' }),
         h('div', { className: 'grid' },
           field({ name: 'guardian_name', label: L.guardian_name, wide: true }),
           signature('guardian_signature', L.guardian_signature, false))),
-      h('details', { className: 'clinic' },
+      h('details', { className: 'clinic', open: true },
         h('summary', { textContent: 'למילוי על ידי הצוות המטפל: חתימת הרופאה' }),
         h('div', { className: 'grid' },
           field({ name: 'clinician_name', label: L.clinician_name, wide: true }),
@@ -159,9 +159,11 @@
   app.append(
     h('div', { className: 'title-block' },
       h('h1', { textContent: F.TITLE }),
+      h('p', { className: 'brand', textContent: F.BRAND }),
       h('p', { className: 'intro', textContent: F.INTRO })),
     ...(notice ? [notice] : []),
-    form);
+    form,
+    h('p', { className: 'form-footer', dir: 'ltr', textContent: F.FOOTER }));
 
   const fullName = form.elements.full_name;
   const patientName = form.elements.patient_name;

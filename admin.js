@@ -169,6 +169,8 @@
     render(
       toolbar(back, print),
       h('h1', { textContent: F.TITLE }),
+      h('p', { className: 'brand', textContent: F.BRAND }),
+      h('p', { className: 'legal', textContent: F.INTRO }),
       h('p', { className: 'intro', textContent: `התקבל ${formatDateTime(rec.created_at)}. גרסת טופס ${rec.form_version}.` }),
       rec.form_version !== F.VERSION
         ? h('p', { className: 'notice', textContent: `הטופס נחתם בגרסה ${rec.form_version}. נוסח ההסכמה המוצג כאן הוא של הגרסה הנוכחית, ${F.VERSION}.` })
@@ -206,8 +208,9 @@
           row(L.guardian_name, d.guardian_name),
           signatureRow(`${L.guardian_signature} (מלווה)`, sigs.guardian_signature),
           row(L.clinician_name, d.clinician_name),
-          signatureRow(L.clinician_signature, sigs.clinician_signature)),
-        h('p', { className: 'legal', textContent: F.FINAL.note })));
+          signatureRow(`${L.clinician_signature} (רופאה)`, sigs.clinician_signature)),
+        h('p', { className: 'legal', textContent: F.FINAL.note })),
+      h('p', { className: 'form-footer', dir: 'ltr', textContent: F.FOOTER }));
     window.scrollTo(0, 0);
   }
 
